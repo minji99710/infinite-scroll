@@ -9,7 +9,7 @@ class PubSub {
   subscribe (event, callback) {
     const self = this
 
-    if (!self.events.hasOwnProperty(event)) {
+    if (!Object.prototype.hasOwnProperty.call(self.events, event)) {
       self.events[event] = []
     }
 
@@ -19,7 +19,7 @@ class PubSub {
   publish (event, data = {}) {
     const self = this
 
-    if (!self.events.hasOwnProperty(event)) {
+    if (!Object.prototype.hasOwnProperty.call(self.events, event)) {
       return []
     }
 
@@ -35,31 +35,13 @@ class Store {
     self.state = {}
     self.status = 'resting'
     self.events = new PubSub()
-
-    if (params.hasOwnProperty('actions')) {
-      self.actions = params.actions
-    }
-
-    if (params.hasOwnProperty('mutations')) {
-      self.mutations = params.mutations
-    }
-
     self.state = new Proxy((params.state || {}), {
       get: function (state, key) {
         return state[key]
       },
       set: function (state, key, value) {
         state[key] = value
-
-        console.log(`categoryChange: ${key}: ${value}`)
-        // console.log('self.state: ', self.state.category)
         self.events.publish('categoryChange', self.state.category)
-
-        // if (self.status !== 'mutation') {
-        //   console.warn(`You should use a mutation to set ${key}`)
-        // }
-
-        self.status = 'resting'
 
         return true
       }

@@ -1,9 +1,9 @@
-// do something!
 import { store } from './index.js'
 
 const get = (target) => {
   return document.querySelector(target)
 }
+
 const category = ['all', 'business', 'entertainment', 'health', 'science', 'sports', 'technology']
 const name = ['전체보기', '비즈니스', '엔터테인먼트', '건강', '과학', '스포츠', '기술']
 const categoryChange = (e) => {
