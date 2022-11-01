@@ -1,4 +1,3 @@
-
 import { Nav, NewsList, store } from './components/index.js'
 const get = (target) => {
   return document.querySelector(target)
@@ -8,14 +7,16 @@ let page = 1
 let total = 0
 let end = Number.MAX_SAFE_INTEGER
 const pageSize = 5
+let isCategoryChanged = false
 
 const $root = get('#root')
-const API_KEY = 'a22384a2f58645b38b03042b371375e0'
+const API_KEY = 'e3ee7ac1d10142fbba7da5b7fac850d7'
 // const API_KEY2 = 'b011ef58697141568db9adcde2861f3f'
-// const API_KEY3 = '0c08fa867ea94be184a866d76fe5d0b1'
-// const API_KEY4 = 'e3ee7ac1d10142fbba7da5b7fac850d7'
+// const API_KEY3 = "a22384a2f58645b38b03042b371375e0"
+// const API_KEY4 =  "0c08fa867ea94be184a866d76fe5d0b1"
 
-const defaultImgUrl = 'https://image.ajunews.com/content/image/2022/02/20/20220220180523846963.jpg'
+const defaultImgUrl =
+    'https://image.ajunews.com/content/image/2022/02/20/20220220180523846963.jpg'
 const defaultDesc = 'No description available'
 
 const init = () => {
@@ -74,6 +75,7 @@ export const loadPost = async (category) => {
     const response = await getPost(category)
     end = response.data.totalResults
     showPost(response.data.articles)
+    isCategoryChanged = false
   } catch (error) {
     console.error(error)
   }
@@ -85,7 +87,8 @@ const LoadOnScroll = () => {
   }
   const $scrollObserver = get('.scroll-observer')
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+    if (isCategoryChanged) return
+    entries.forEach((entry) => {
       if (entry.intersectionRatio >= 0.5) {
         page++
         total += 5
@@ -103,17 +106,21 @@ const LoadOnScroll = () => {
   }
 }
 
-const categoryChange = () => {
+const categoryChanged = (category) => {
   const $newsList = document.querySelector('.news-list')
   $newsList.innerHTML = ''
   page = 1
   total = 0
   const $loader = get('.scroll-observer')
-  $loader.style.display = 'block'
+
+  isCategoryChanged = true
+  $loader.style.display = ''
+  loadPost(category)
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   init()
+  loadPost('all')
   LoadOnScroll()
-  store.events.subscribe('categoryChange', categoryChange)
+  store.events.subscribe('categoryChange', categoryChanged)
 })
